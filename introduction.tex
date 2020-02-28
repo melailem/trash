@@ -1,0 +1,27 @@
+% !TEX root = main.tex
+\section{INTRODUCTION}
+
+Classical techniques in probabilistic graphical models exploit (tractable) structures heavily for approximate inference~\citep{koller2009probabilistic}. Well-studied examples are mean-field approaches by assuming factorized forms of posteriors~\citep{ jordan1999introduction},  (conjugate) variational bounds on likelihoods~\citep{jaakkola1999variational, jaakkola2000bayesian},   and others~\citep{saul1996mean,saul1996exploiting}.  In these methods, the forms of the approximate posteriors depend on the model structures, the definitions of the conditional probability tables or distributions, and the priors. %Deriving them is often non-trivial, especially for complex models. \yiming{Yiming: a reviewer from Neurips questioned this sentence, since the non-trivial derivation would be an disadvantage of our method ACP.} 
+For instance, deriving variational bounds often requires identifying special properties such as convexity and concavity of likelihood (or partition) functions. And in some cases, the derivation also depends on whether an upper-bound or lower-bound is needed~\citep{jebara2001reversing}. %Although deriving the bounds is complex, it carries model-specific knowledge which leads to better generalization.
+
+In contrast, recent approaches in amortized variational inference  (AVI) use neural networks to represent posteriors and reparameterization tricks to compute the likelihoods with Monte Carlo samples~\citep{kingma2013auto,mnih2014neural}. 
+Even earlier, neural networks were applied to approximate posterior distribution in a supervised manner~\citep{morris2001recognition}.
+%Even earlier, ~\citep{morris2001recognition} applied neural networks to approximate posterior distribution in a supervised manner. 
+What is appealing in this type of methods is that selecting the inference neural network requires significantly reduced efforts, and the structure of the generative model (and the corresponding likelihood function) does not directly come into play in determining the inference network. In other words,  the inference network (\ie the encoder) and the generative model (\ie the decoder) are parameterized independently, without explicitly sharing information.  As such, with a large amount of training data, a high-capacity inference network is able to approximate the posterior well, and learning the generative model can be effective as the variance of the Monte Carlo sampling can be reduced. However, when the amount of the training data is small, the inference network can overfit and estimating the generative model has a high variance.
+
+\emph{Is there a way to combine these two different types of approaches?} In this paper, we take a step in this direction. Our main idea is to use the above-mentioned classical methods to derive approximate but tractable posteriors (and approximate likelihood functions) and then identify the optimal variational parameters by learning a neural network. 
+
+The key difference from the classical approaches is that the variational parameters are not optimized to give the tightest bounds on the likelihood functions but to maximize the evidence lower bound (ELBO). On the other hand, the key difference from the AVI is that the posterior and the generative model share information such that the posterior contributes explicitly to the gradient of  the ELBO with respect to the generative  model parameters.
+
+We apply this new hybrid approach to the  \textsc{noisy-or} model, which has been studied for binary observations and latent variables. Earlier work such as \citep{jaakkola1999variational, vsingliar2006noisy} proposed classical variational inference approaches. More recently, polynomial-time algorithms are designed to learn the structure and parameters of \textsc{noisy-or} model~\citep{halpern2013unsupervised, jernite2013discovering}.
+%\citep{halpern2013unsupervised, jernite2013discovering} designed polynomial-time algorithms to learn the structure and parameters of \textsc{noisy-or} model. 
+However they require strong assumptions on the structure of the graph. Halpern~\citep{halpern2016semi} studied semi-supervised method with stochastic variational learning on \textsc{noisy-or} and achieved good performance in parameter recovering. 
+Moreover, stochastic variational inference (SVI) has been designed for hierarchical \textsc{noisy-or}~\citep{jivariational} for faster convergence and achieved on-par performance with its batch counterpart.
+Taking advantages of the conjugate bounds, the proposed approach generalizes better than AVI and SVI when there is  limited data for fitting while remaining equally competitive when there is more data. 
+%We show the proposed approach outperforms the classical ones, AVI and the recent SVI.
+
+In the following, we will describe related work by reviewing different types of variational inference techniques in Section \ref{sec: vi} for the  \textsc{noisy-or} model. We describe our approach in Section \ref{sec: method}. In Section \ref{sec: experiments}, we show our experiment results, followed by discussion in section~\ref{diss}.
+
+
+
+

@@ -1,0 +1,124 @@
+% !TEX root = main.tex
+%\section{A hybrid approach for variational inference}
+\section{AMORTIZED CONJUGATE POSTERIOR}
+\label{sec: method}
+In this section, we introduce our inference strategy, Amortized Conjugate Posterior (ACP), a hybrid approach combining the classical CDI and the recent AVI approaches. 
+%In the following, we will show the form of approximate posterior for \textsc{noisy-or} derived from the classical method, and propose our approach which takes advantages for both classical methods and AVI when we have small amount of training data.
+
+\iffalse
+\subsection{Variational posterior}
+
+Instead of approximating a factorized posterior distribution using a feed-forward network as in AVI, the upper-bound described for $p(x_i=1|\bz)$ in eq.~(\ref{eq:positiveUB}) can also be used to give rise to a factorized posterior distribution, after applying the Bayes rule. However, the posterior is a variational one:
+%is not the true one, it is a variational one:
+\begin{align}
+    q(\bz|\bx, \bpsi)  \propto 
+     &\prod_{i: x_i =1}^D\tp(x_i=1|\bz, \psi_i) \cdot \nonumber \\
+     &\prod_{i: x_i=0}^Dp(x_i=0|\bz)\prod_{k=0}^K p(z_k)
+\label{eq: lvi posterior}
+\end{align}
+Note that we only use the upper-bound for positive observations where $x_i=1$. For negative observations, we use the true likelihood.  After re-organizing the terms, we observe that
+\begin{align}
+    q(\bz|\bx, \bpsi) = \prod_{k=1}^K q(z_k |\bx, \bpsi)
+\end{align}
+Namely, the variational posterior factorizes. And each factor is
+\begin{align}
+    \medmath{q(z_k=1 |\bx, \bpsi) = 
+    \sigma\left(\sum_{i:x_i=1}\psi_i\theta_{ik} - \sum_{i:x_i=0}\theta_{ik} + \log \frac{\mu_k}{1-\mu_k}\right)}
+\label{eq:factorizedposterior}
+\end{align}
+where $\sigma(\cdot)$ is the sigmoid function. The detailed derivation can be found in supplementary material.    
+
+Note that, in classical methods the variational parameters $\bpsi$ are optimized to tighten the upper-bounds according to eq.~(\ref{eqTightBound}).  However, this is not the only option. We describe alternative approaches next.
+
+
+
+%The variational and model parameters, $\bphi$ and $\btheta$, are optimized using variational EM. In the E-step, we update $\bphi$ to find the tightest likelihood upper-bound:
+%\begin{align}
+%    \bphi &= \arg \min_{\bphi} \tptheta(\bx|\bphi) \nonumber\\
+%    &= \arg \min_{\bphi} \sum_{\bz}\prod_{i:x_i=1}^D \tptheta(x_i=1|\bz, \bphi)\nonumber \\ &\prod_{j:x_j=0}^D p(x_j=0|\bz) \prod_{k=1}^K p(z_k)
+%\label{eq: optimize phi em}
+%\end{align}
+
+%However, later in Section \ref{sec: experiment inference}, we will show that tighter likelihood upper-bound does not necessarily mean better posterior approximation. We therefore explore other ways to estimate $\bphi$.
+\fi
+%\subsection{Amortized conjugate posterior}
+%\label{sec: method alvi}
+
+Instead of seeking the tightest upper-bounds for the likelihood function (for positive observations), we propose to optimize $\bpsi$ to maximize the ELBO in eq.~(\ref{eq:elbo}). Moreover, to amortize the inference, we parameterize $\bpsi$ as in AVI,
+\begin{equation}
+\bpsi = \textsc{mlp}(\bx; \bphi)
+\label{eq:mlp}
+\end{equation}
+where the parameters $\bphi$ of the neural network are shared by all data points. Namely, for each $\bx^{(n)}$, its variational distribution is
+\begin{align}
+q(\bz|\bx^{(n)}; \bpsi^{(n)}) & =  q\big(\bz|\bx^{(n)}; \textsc{mlp}(\bx^{(n)}; \bphi)\big)\nonumber \\
+& \equiv q(\bz|\bx^{(n)}; \bphi)
+\end{align}
+As in AVI, to optimize both $\btheta$ and $\bphi$, we use Monte Carlo sampling to compute the ELBO (and its gradients with respect to the parameters). Note that in \textsc{noisy-or}, the ELBO can be written as
+\begin{align}
+    & \mathcal{L(\bx; \btheta, \bphi)}  = \sum_{i:x_i=1}^D\mathbb{E}_{\pqx)}[\log p(x_i=1|\bz; \btheta)] \nonumber\\
+    & + \sum_{i:x_i=0}^D \mathbb{E}_{\pqx)}[\log p(x_i=0|\bz; \btheta)] \nonumber\\
+    & - D_{KL}\Big(\pqx||\ppz\Big) \leq \log p(\bx; \btheta)
+\label{eq: elbo for nor}
+\end{align}
+where the expectation of the positive log-likelihood (the first term in eq.~(\ref{eq: elbo for nor})) is intractable while the negative log-likelihood (the second term) and the KL divergence can be computed analytically. Hence, we need to estimate the first term using Monte Carlo sampling. 
+
+Specifically, for each training data point $\bx$, we use eq.~(\ref{eq:mlp}) to compute the variational parameters, and use the form of posterior as eq.~(\ref{eq:factorizedposterior}). We then sample from the posterior --- since $\pqx$ is Bernoulli, we use the Gumbel-Softmax reparameterization trick~\citep{jang2016categorical}. 
+The samples are then used to compute the expectation of \emph{\textbf{true}} positive likelihoods $p(x_i=1|\bz)$ (and their gradients). The pseudo-code for parameter estimation of ACP is presented in the supplementary material.
+
+
+
+The key difference from AVI is that the (variational) posterior has also dependency on the generative model parameters $\btheta$. While they contribute indirectly to the gradients of the expected conditional likelihoods for positive observations in the ELBO, the expected likelihoods for negative ones and the KL divergence between the posterior and the prior are analytically tractable and the gradients with respect to $\btheta$ are directly used to optimize the parameters. In AVI, the expected conditional likelihood is a constant with respect to the generative model parameters and it does not contribute to the update.
+
+\begin{table}[t]
+\centering
+\caption{\small Contrast of variational inference approaches}
+\label{tab: methods}
+\resizebox{1\columnwidth}{!}{
+\begin{tabular}{|c|c|c|c|}
+\hline
+       & objective   & constrained posterior & amortized \\ \hline
+AVI    & ELBO        & no                  & yes       \\ \hline
+LB-CDI & LB          & yes (LB)               & no        \\ \hline
+UB-CDI & UB          & yes (UB)               & no        \\ \hline
+SVI    & LB & no     & no        \\ \hline
+%ASVI   & LB & no                  & yes       \\ \hline
+ACP (ours)   & ELBO        & yes (UB)                 & yes       \\ \hline
+\end{tabular}
+}
+\centering
+\vspace{-1em}
+\end{table}
+
+In Table \ref{tab: methods}, we summarize various approaches. 
+LB and UB in the parenthesis stand for whether the constrained posterior is derive from the lower-bound or upper-bound of the ELBO.
+Comparing to AVI, the specific form (eq.~(\ref{eq:factorizedposterior})) of the variational posterior -- how evidence $\bx$ is incorporated and the architecture is formed -- contains model-specific knowledge, which could prevent overfitting and improve generalization. Comparing to CDI and SVI, ACP optimizes ELBO directly instead of optimizing the lower-bound or upper-bound of ELBO, which gives better performance.
+%constrains the capacity of the inference network in a typical AVI approach. However, this can be advantageous: when the amount of training data is limited, the constrained form could prevent overfitting and improve generalization.
+Our empirical results support this claim.  
+
+
+
+
+
+%where $\phi_i > 0$, and $\mu_k$ is the prior's Bernoulli parameter. Recall that $\theta_{ik}$ is the parameter of $p(x_i|\theta_k)$. Based on the definition of $\theta_{ik}$, we observe from Eq. \ref{eq: nor local posterior} that, the more positive data dimensions we observe, the more likely to activate $z_k$ if $\theta_{ik}$ is significant. That is, the posterior in equation (\ref{eq: nor local posterior}) increases proportionally with $p(x_i=1|z_k)$. 
+%as we have seen more positive data dimension $x_i$, the probability of $z_k$ being activated would increase proportional to $p(x_i|z_k)$. 
+%The negative observations have a contradict affect on the posterior distribution.
+
+%The variational parameter $\phi_i$ can be considered as a weighting factor, which controls the importance of the positive findings for posterior approximation. As we see, Eq. \ref{eq: nor local posterior} gives us an inference structure specially designed for Noisy-OR model, which incorporates the inductive bias from Noisy-OR decoder.
+
+%Instead of optimizing LVP $\bphi$ using variational EM, we propose ALVI, which uses the idea of AVI to predict a set of LVP using global parameters. We then estimate the parameters by maximum likelihood. The inference model of LVI, AVI and ALVI are depicted in Figure \ref{fig: inference structure}.
+
+%Compared to LVI, ALVI not only optimizes model and variational parameters jointly, 
+%generative and inference models jointly and directly encourages accurately inference,
+%but also performs faster inference, using feed-forward network, during test time. The key difference between AVI and ALVI is that, the former directly approximates the posterior distribution, while the latter uses global parameters to approximate the LVP in LVI, which has a special form depending on the model's structure. As we will show in experiments later, the dependency between encoder and decoder constrains the inference capability a bit, yet introduces strong inductive bias for better generalization ability when we do not have sufficient training data. 
+
+%Here we investigate two ways to approximate $\bphi$:
+%\begin{itemize}
+%    \item[(a)] ALVI-ipd: Estimating $\bphi$ as a trainable parameter independent of $\bx$
+%    \item[(b)] ALVI-dp: Predicting $\bphi$ using a function of $\bx$, $\bphi = g_{\lambda}(\bx)$
+%\end{itemize}
+%As a special example in ALVI-dp, we use an MLP as $g_{\blambda}(\cdot)$. 
+%And we optimize $\bphi$ jointly with the generative the model parameters $\btheta$ using gradient ascent and backpropagation to maximize the ELBO.
+
+%ALVI takes advantages of both LVI and AVI for better generalization ability, accurate posterior approximation, and fast inference during test time.
+

@@ -1,0 +1,15 @@
+% !TEX root = main.tex
+\section*{Changes to be made}
+\begin{itemize}
+\item \done{Change names of Toy-Sparse/Toy-Pattern}: \yiming{changed them to PASY(pattern synthetic dataset) and SASY(sampled synthetic dataset)}
+\item \done{Cite  Yoni Halpern thesis etc}\yiming{Yiming: done. His approach is more like our AVI approach instead of ACP. They added an additional "supervised signal" to ELBO} 
+\item \done{Tighten section 2.3 (when explaining the dual)}: \yiming{Yiming: Done, change the notation slightly for $\psi$ and $\psi^*$. The notations in other sections are not changed yet. If you feel the notation is fine I'll modify other sections. }
+\item \done{Probably explain how the data is generated}: \yiming{Yiming: done}
+\item In Document classification, is the thresholding making sense?  Perhaps comparing to prior? Perhaps using the probabilities  \yiming{Yiming: new results will be out tonight}
+\item \done{No need to worry. Fig. 7: seems more dimensionality can reduce the gap between AVI and ACP?}
+\item \done{Fig. 8: using binary z or using continuous z?} \yiming{Yiming: approximate posterior probabilities}
+\item \todo{When do we have results in section 4.7/collaborative filtering?}
+%\item section 4.8: probably write out the form of the upperbound? You probably use also the upperbound likelihood for negative observation? Probably not the KL divergence in the objective function -- technically you are doing maximum likelihood estimation with an approximate (upperbound) likelihood function
+\item section 4.9 why sharing the weigths in the bottom layer? What happens if you do not share? \yiming{Yiming: experiments are running}
+\item \done{Specify how many samples are used in MC sampling} \yiming{Yiming: done}
+\end{itemize}

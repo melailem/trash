@@ -1,0 +1,115 @@
+\documentclass[twoside]{article}
+
+%\usepackage{aistats2020}
+\usepackage[accepted]{aistats2020}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}
+\usepackage{mathtools, nccmath}
+
+\usepackage{graphicx}
+\graphicspath{{figs/}}
+\usepackage{multirow,xspace}
+\usepackage[ruled,vlined]{algorithm2e}
+
+\usepackage{bm}
+%\usepackage{bbm}
+\usepackage{amsmath}
+\usepackage{layouts}
+\usepackage{subcaption}
+\newcommand{\todo}[1]{{\color{red}#1}}
+\newcommand{\yiming}[1]{{\color{blue}#1}}
+\newcommand{\done}[1]{{\color{gray}#1}}
+
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bx}{\mathbf{x}}
+\newcommand{\bz}{\mathbf{z}}
+
+\newcommand{\btheta}{\bm{\theta}}
+\newcommand{\bphi}{\bm{\phi}}
+\newcommand{\blambda}{\bm{\lambda}}
+\newcommand{\bmu}{\bm{\mu}}
+\newcommand{\bxi}{\bm{\xi}}
+\newcommand{\bpsi}{\bm{\psi}}
+\newcommand{\bu}{\bm{u}}
+%\newcommand{\ptheta}{p_{\btheta}}
+%\newcommand{\pmu}{p_{\bmu}}
+%\newcommand{\tptheta}{\Tilde{p}_{\btheta}}
+\newcommand{\tp}{\Tilde{p}}
+%\newcommand{\qphi}{q_{\bphi}}
+\newcommand{\expqn}{\mathbb{E}_{q(\bz|\bx^{(n)}; {\bphi})}}
+\newcommand{\pqn}{q(\bz|\bx^{(n)}; {\bphi})}
+\newcommand{\pqx}{q(\bz|\bx; \bphi)}
+\newcommand{\ppz}{p(\bz; \btheta )}
+\newcommand{\pcond}{p_{\btheta}(\bx|\bz)}
+\newcommand{\ie}{{\it i.e. }}
+
+\newcommand{\pattern}{\textsc{syn-pattern}\xspace}
+\newcommand{\sparse}{\textsc{syn-random}\xspace}
+% If your paper is accepted, change the options for the package
+% aistats2020 as follows:
+%
+% \usepackage[accepted]{aistats2020}
+%
+% This option will print headings for the title of your paper and
+% headings for the authors names, plus a copyright note at the end of
+% the first column of the first page.
+
+% If you set papersize explicitly, activate the following three lines:
+\special{papersize = 8.5in, 11in}
+\setlength{\pdfpageheight}{11in}
+\setlength{\pdfpagewidth}{8.5in}
+
+% If you use natbib package, activate the following three lines:
+\usepackage[round]{natbib}
+\renewcommand{\bibname}{References}
+\renewcommand{\bibsection}{\subsubsection*{\bibname}}
+
+% If you use BibTeX in apalike style, activate the following line:
+%\bibliographystyle{apalike}
+
+\begin{document}
+
+% If your paper is accepted and the title of your paper is very long,
+% the style will print as headings an error message. Use the following
+% command to supply a shorter title of your paper so that it can be
+% used as headings.
+%
+%\runningtitle{I use this title instead because the last one was very long}
+
+% If your paper is accepted and the number of authors is large, the
+% style will print as headings an error message. Use the following
+% command to supply a shorter version of the authors names so that
+% they can be used as headings (for example, use only the surnames)
+%
+%\runningauthor{Surname 1, Surname 2, Surname 3, ...., Surname n}
+
+\twocolumn[
+
+\aistatstitle{Amortized Inference of Variational Bounds for Learning Noisy-OR}
+
+\aistatsauthor{ Yiming Yan \And Melissa Ailem \And Fei Sha }
+
+\aistatsaddress{ University of Southern California \And  University of Southern California \And Google Research} ]
+
+
+\input{abstract.tex}
+
+\input{introduction.tex}
+\input{vi.tex}
+\input{method.tex}
+\input{experiments.tex}
+\input{discussion.tex}
+
+\textbf{Acknowledgments} {\small We appreciate the feedback from the reviewers. This work is partially supported by NSF Awards IIS-1513966/ 1632803/1833137, CCF-1139148, DARPA Award\#: FA8750-18-2-0117,  DARPA-D3M - Award UCB-00009528, Google Research Awards, gifts from Facebook and Netflix, and ARO\# W911NF-12-1-0241 and W911NF-15-1-0484.}
+
+\bibliographystyle{plainnat}
+\bibliography{example_paper} 
+
+\end{document}

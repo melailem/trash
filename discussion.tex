@@ -1,0 +1,8 @@
+% !TEX root = main.tex
+%\section{Discussion}
+%In this paper, we performed empirical study on \textsc{noisy-or} model to validate our claim that when we have limited amount of training data, ACP benefits from its model-dependent form of approximate posterior distribution to alleviate overfitting. Although we only discussed \textsc{noisy-or} model in this paper, this approach is not limited to \textsc{noisy-or} model. One interesting future direction would be applying this method to other generative models which have the convexity/concavity on their likelihood functions (i.e. sigmoid belief net). We can thus derive the conjugate bounds of their likelihoods and apply ACP on them.
+
+\section{CONCLUSION}
+\label{diss}
+
+We proposed ACP for variational inference, which combines the classical techniques of deriving variational bounds over likelihoods and recent approaches using neural networks for amortized variational inference. We showed that by constraining the form of approximate posterior using classical methods and learning the variational parameters to maximize ELBO, ACP can generalize well even with a small amount of training data. While with large amount of training data, our approach retains the high capacity for better generative modeling. Emprical studies have shown the advantages of ACP. Our future direction is to extend this approach to hierarchical models.
